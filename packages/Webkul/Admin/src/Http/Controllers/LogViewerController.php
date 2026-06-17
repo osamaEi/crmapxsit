@@ -15,17 +15,17 @@ class LogViewerController extends Controller
 
     public function index(Request $request)
     {
-        $lines    = $this->readLog();
-        $entries  = $this->parseEntries($lines);
-        $filter   = $request->query('level', 'all');
-        $search   = $request->query('search', '');
+        $lines = $this->readLog();
+        $entries = $this->parseEntries($lines);
+        $filter = $request->query('level', 'all');
+        $search = $request->query('search', '');
 
         if ($filter !== 'all') {
-            $entries = array_filter($entries, fn($e) => strtolower($e['level']) === strtolower($filter));
+            $entries = array_filter($entries, fn ($e) => strtolower($e['level']) === strtolower($filter));
         }
 
         if ($search) {
-            $entries = array_filter($entries, fn($e) => stripos($e['raw'], $search) !== false);
+            $entries = array_filter($entries, fn ($e) => stripos($e['raw'], $search) !== false);
         }
 
         $entries = array_values(array_slice(array_reverse($entries), 0, 200));
@@ -65,14 +65,14 @@ class LogViewerController extends Controller
 
                 $current = [
                     'datetime' => $m[1],
-                    'level'    => strtoupper($m[2]),
-                    'message'  => $m[3],
-                    'stack'    => '',
-                    'raw'      => $line,
+                    'level' => strtoupper($m[2]),
+                    'message' => $m[3],
+                    'stack' => '',
+                    'raw' => $line,
                 ];
             } elseif ($current) {
-                $current['stack'] .= "\n" . $line;
-                $current['raw']   .= "\n" . $line;
+                $current['stack'] .= "\n".$line;
+                $current['raw'] .= "\n".$line;
             }
         }
 
