@@ -2040,6 +2040,7 @@ return [
         'view' => [
             'title' => 'Lead: :title',
             'rotten-days' => ':days Days',
+            'edit-btn' => 'Edit Lead',
 
             'tabs' => [
                 'description' => 'Description',

@@ -270,7 +270,7 @@ class LeadController extends Controller
         if (request()->has('closed_at')) {
             return redirect()->back();
         } else {
-            return redirect()->route('admin.leads.index', $data['lead_pipeline_id']);
+            return redirect()->route('admin.leads.view', $id);
         }
     }
 

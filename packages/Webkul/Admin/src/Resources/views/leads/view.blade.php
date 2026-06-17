@@ -18,6 +18,16 @@
                         name="leads.view"
                         :entity="$lead"
                     />
+
+                    @if (bouncer()->hasPermission('leads.edit'))
+                        <a
+                            href="{{ route('admin.leads.edit', $lead->id) }}"
+                            class="secondary-button flex items-center gap-1 px-3 py-1.5 text-sm"
+                        >
+                            <i class="icon-edit text-base"></i>
+                            @lang('admin::app.leads.view.edit-btn')
+                        </a>
+                    @endif
                 </div>
 
                 <div class="mb-2">
