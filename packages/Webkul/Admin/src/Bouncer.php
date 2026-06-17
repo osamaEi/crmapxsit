@@ -2,8 +2,6 @@
 
 namespace Webkul\Admin;
 
-use Webkul\User\Repositories\UserRepository;
-
 class Bouncer
 {
     /**
