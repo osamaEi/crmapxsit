@@ -113,7 +113,7 @@ php artisan serve
 
 ```
 email:admin@example.com
-password:admin123
+password:123456789
 ```
 
 ### Krayin Cloud Hosting
