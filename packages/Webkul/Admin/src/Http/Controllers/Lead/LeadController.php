@@ -126,6 +126,7 @@ class LeadController extends Controller
                     'pipeline.stages',
                     'stage',
                     'attribute_values',
+                    'attribute_values.attribute',
                 ])->paginate(10)),
 
                 'meta' => [

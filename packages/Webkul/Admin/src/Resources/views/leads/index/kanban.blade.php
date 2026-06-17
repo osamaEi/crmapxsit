@@ -174,25 +174,39 @@
                                     {!! view_render_event('admin.leads.index.kanban.content.stage.body.card.title.after') !!}
 
                                     <div class="flex flex-wrap gap-1">
+                                        <!-- Lead Status badge -->
+                                        <div
+                                            v-if="element.lead_status_label"
+                                            class="rounded-xl px-2 py-1 text-xs font-semibold"
+                                            style="background:#dbeafe; color:#1d4ed8;"
+                                        >
+                                            @{{ element.lead_status_label }}
+                                        </div>
+
+                                        <!-- Phone -->
+                                        <div
+                                            v-if="element.phone_number"
+                                            class="flex items-center gap-1 rounded-xl bg-gray-100 px-2 py-1 text-xs dark:bg-gray-800 dark:text-white"
+                                        >
+                                            <span class="icon-phone text-sm"></span>
+                                            @{{ element.phone_number }}
+                                        </div>
+
+                                        <!-- Sales Owner -->
                                         <div
                                             class="flex items-center gap-1 rounded-xl bg-gray-200 px-2 py-1 text-xs font-medium dark:bg-gray-800 dark:text-white"
                                             v-if="element.user"
                                         >
                                             <span class="icon-settings-user text-sm"></span>
-
                                             @{{ element.user.name }}
                                         </div>
 
-                                        <div class="rounded-xl bg-gray-200 px-2 py-1 text-xs font-medium dark:bg-gray-800 dark:text-white">
-                                            @{{ element.formatted_lead_value }}
-                                        </div>
-
-                                        <div class="rounded-xl bg-gray-200 px-2 py-1 text-xs font-medium dark:bg-gray-800 dark:text-white">
+                                        <!-- Source -->
+                                        <div
+                                            v-if="element.source && element.source.name"
+                                            class="rounded-xl bg-gray-200 px-2 py-1 text-xs font-medium dark:bg-gray-800 dark:text-white"
+                                        >
                                             @{{ element.source.name }}
-                                        </div>
-
-                                        <div class="rounded-xl bg-gray-200 px-2 py-1 text-xs font-medium dark:bg-gray-800 dark:text-white">
-                                            @{{ element.type.name }}
                                         </div>
 
                                         <!-- Tags -->

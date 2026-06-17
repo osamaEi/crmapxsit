@@ -15,12 +15,31 @@ class LeadResource extends JsonResource
      */
     public function toArray($request)
     {
+        // Resolve lead_status option name from attribute_values
+        $leadStatusLabel = null;
+        $phoneNumber     = null;
+
+        if ($this->attribute_values) {
+            foreach ($this->attribute_values as $av) {
+                if ($av->attribute && $av->attribute->code === 'lead_status' && $av->integer_value) {
+                    $opt = \Webkul\Attribute\Models\AttributeOption::find($av->integer_value);
+                    $leadStatusLabel = $opt?->name;
+                }
+
+                if ($av->attribute && $av->attribute->code === 'phone_number') {
+                    $phoneNumber = $av->text_value;
+                }
+            }
+        }
+
         return [
             'id' => $this->id,
             'title' => $this->title,
             'lead_value' => $this->lead_value,
             'formatted_lead_value' => core()->formatBasePrice($this->lead_value),
             'status' => $this->status,
+            'lead_status_label' => $leadStatusLabel,
+            'phone_number' => $phoneNumber,
             'expected_close_date' => $this->expected_close_date,
             'rotten_days' => $this->rotten_days,
             'closed_at' => $this->closed_at,
