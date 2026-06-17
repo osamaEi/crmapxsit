@@ -75,7 +75,8 @@
 
                         <!-- Draggable Stage Lead Cards -->
                         <draggable
-                            class="flex h-[calc(100vh-317px)] flex-col gap-2 overflow-y-auto p-2"
+                            class="flex flex-col gap-2 overflow-y-auto p-2"
+                            style="height: calc(100vh - 220px); min-height: 400px;"
                             :class="{ 'justify-center': stage.leads.data.length === 0 }"
                             ghost-class="draggable-ghost"
                             handle=".lead-item"
@@ -662,7 +663,8 @@
                  * @returns {void}
                  */
                 handleScroll(stage, event) {
-                    const bottom = event.target.scrollHeight - event.target.scrollTop === event.target.clientHeight;
+                    const el = event.target;
+                    const bottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
 
                     if (! bottom) {
                         return;
