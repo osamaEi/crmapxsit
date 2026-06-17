@@ -4,6 +4,7 @@ namespace Webkul\Admin\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Webkul\Attribute\Models\AttributeOption;
 
 class LeadResource extends JsonResource
 {
@@ -17,12 +18,12 @@ class LeadResource extends JsonResource
     {
         // Resolve lead_status option name from attribute_values
         $leadStatusLabel = null;
-        $phoneNumber     = null;
+        $phoneNumber = null;
 
         if ($this->attribute_values) {
             foreach ($this->attribute_values as $av) {
                 if ($av->attribute && $av->attribute->code === 'lead_status' && $av->integer_value) {
-                    $opt = \Webkul\Attribute\Models\AttributeOption::find($av->integer_value);
+                    $opt = AttributeOption::find($av->integer_value);
                     $leadStatusLabel = $opt?->name;
                 }
 
