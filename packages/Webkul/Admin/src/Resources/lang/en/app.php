@@ -2094,6 +2094,13 @@ return [
                 'won-value' => 'Won Value',
                 'lost-reason' => 'Lost Reason',
                 'save-btn' => 'Save',
+                'add-comment' => 'Add a Comment',
+                'moving-to' => 'Moving stage to: :stage',
+                'comment-label' => 'Comment',
+                'optional' => 'optional',
+                'comment-placeholder' => 'Write a comment about this stage change...',
+                'skip-btn' => 'Skip',
+                'save-comment-btn' => 'Save & Continue',
             ],
 
             'tags' => [

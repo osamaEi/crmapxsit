@@ -26,7 +26,7 @@
                         '!bg-red-500 text-white dark:text-gray-900 ltr:after:bg-red-500 rtl:before:bg-red-500': currentStage.code == 'lost',
                     }"
                     v-if="! ['won', 'lost'].includes(stage.code)"
-                    @click="update(stage)"
+                    @click="openCommentModal(stage)"
                 >
                     <span class="z-20 whitespace-nowrap text-sm font-medium dark:text-white">
                         @{{ stage.name }}
@@ -173,6 +173,52 @@
             </x-admin::form>
 
             {!! view_render_event('admin.leads.view.stages.form_controls.after', ['lead' => $lead]) !!}
+
+            <!-- Stage Comment Modal -->
+            <x-admin::modal ref="stageCommentModal">
+                <x-slot:header>
+                    <h3 class="text-base font-semibold dark:text-white">
+                        @lang('admin::app.leads.view.stages.add-comment')
+                    </h3>
+                </x-slot>
+
+                <x-slot:content>
+                    <div class="mb-4 rounded-lg bg-blue-50 px-4 py-2 text-sm text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                        @lang('admin::app.leads.view.stages.moving-to'):
+                        <strong v-text="pendingStage ? pendingStage.name : ''"></strong>
+                    </div>
+
+                    <div class="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        @lang('admin::app.leads.view.stages.comment-label')
+                        <span class="text-gray-400">(@lang('admin::app.leads.view.stages.optional'))</span>
+                    </div>
+
+                    <textarea
+                        v-model="stageComment"
+                        rows="4"
+                        class="w-full rounded-lg border border-gray-200 p-3 text-sm text-gray-700 outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                        placeholder="@lang('admin::app.leads.view.stages.comment-placeholder')"
+                    ></textarea>
+                </x-slot>
+
+                <x-slot:footer>
+                    <button
+                        type="button"
+                        class="secondary-button mr-2"
+                        @click="proceedWithComment(false)"
+                    >
+                        @lang('admin::app.leads.view.stages.skip-btn')
+                    </button>
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        @click="proceedWithComment(true)"
+                    >
+                        @lang('admin::app.leads.view.stages.save-comment-btn')
+                    </button>
+                </x-slot>
+            </x-admin::modal>
         </div>
     </script>
 
@@ -191,10 +237,33 @@
                     stages: @json($lead->pipeline->stages),
 
                     stageToggler: '',
+
+                    pendingStage: null,
+
+                    stageComment: '',
                 }
             },
 
             methods: {
+                openCommentModal(stage) {
+                    if (this.currentStage.code == stage.code) {
+                        return;
+                    }
+
+                    this.pendingStage  = stage;
+                    this.stageComment  = '';
+
+                    this.$refs.stageCommentModal.open();
+                },
+
+                proceedWithComment(saveComment) {
+                    this.$refs.stageCommentModal.close();
+
+                    const comment = saveComment ? this.stageComment.trim() : '';
+
+                    this.update(this.pendingStage, null, comment);
+                },
+
                 openModal(stage) {
                     if (this.currentStage.code == stage.code) {
                         return;
@@ -223,7 +292,7 @@
                     this.update(this.nextStage, params);
                 },
 
-                update(stage, params = null) {
+                update(stage, params = null, comment = '') {
                     if (this.currentStage.code == stage.code) {
                         return;
                     }
@@ -241,7 +310,17 @@
 
                             this.currentStage = stage;
 
-                            this.$parent.$refs.activities.get();
+                            if (comment) {
+                                this.$axios.post("{{ route('admin.activities.store') }}", {
+                                    type: 'note',
+                                    lead_id: {{ $lead->id }},
+                                    comment: comment,
+                                }).then(() => {
+                                    this.$parent.$refs.activities.get();
+                                });
+                            } else {
+                                this.$parent.$refs.activities.get();
+                            }
 
                             this.$emitter.emit('add-flash', { type: 'success', message: response.data.message });
                         })
