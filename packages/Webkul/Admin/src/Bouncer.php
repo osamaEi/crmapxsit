@@ -47,14 +47,12 @@ class Bouncer
     {
         $user = auth()->guard('user')->user();
 
-        if ($user->view_permission == 'global') {
+        // Admin role (permission_type = 'all') always sees everything
+        if ($user->role->permission_type == 'all') {
             return null;
         }
 
-        if ($user->view_permission == 'group') {
-            return app(UserRepository::class)->getCurrentUserGroupsUserIds();
-        } else {
-            return [$user->id];
-        }
+        // All other roles only see leads assigned to them
+        return [$user->id];
     }
 }
