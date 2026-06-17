@@ -5,268 +5,239 @@
 
     {!! view_render_event('admin.leads.create.form.before') !!}
 
-    <!-- Create Lead Form -->
     <x-admin::form :action="route('admin.leads.store')">
         <div class="flex flex-col gap-4">
+
+            <!-- Header -->
             <div class="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
                 <div class="flex flex-col gap-2">
                     <x-admin::breadcrumbs name="leads.create" />
-
                     <div class="text-xl font-bold dark:text-white">
                         @lang('admin::app.leads.create.title')
                     </div>
                 </div>
-
-                {!! view_render_event('admin.leads.create.save_button.before') !!}
-
                 <div class="flex items-center gap-x-2.5">
-                    <!-- Save button for person -->
-                    <div class="flex items-center gap-x-2.5">
-                        {!! view_render_event('admin.leads.create.form_buttons.before') !!}
-
-                        <button
-                            type="submit"
-                            class="primary-button"
-                        >
-                            @lang('admin::app.leads.create.save-btn')
-                        </button>
-
-                        {!! view_render_event('admin.leads.create.form_buttons.after') !!}
-                    </div>
+                    <button type="submit" class="primary-button">
+                        @lang('admin::app.leads.create.save-btn')
+                    </button>
                 </div>
-
-                {!! view_render_event('admin.leads.create.save_button.after') !!}
             </div>
 
             @if (request('stage_id'))
-                <input
-                    type="hidden"
-                    id="lead_pipeline_stage_id"
-                    name="lead_pipeline_stage_id"
-                    value="{{ request('stage_id') }}"
-                />
+                <input type="hidden" name="lead_pipeline_stage_id" value="{{ request('stage_id') }}" />
             @endif
-
             @if (request('pipeline_id'))
-                <input
-                    type="hidden"
-                    id="lead_pipeline_id"
-                    name="lead_pipeline_id"
-                    value="{{ request('pipeline_id') }}"
-                />
+                <input type="hidden" name="lead_pipeline_id" value="{{ request('pipeline_id') }}" />
             @endif
 
-            <!-- Lead Create Component -->
-            <v-lead-create>
-                <x-admin::shimmer.leads.datagrid />
-            </v-lead-create>
+            <!-- Form Body -->
+            <div class="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+
+                <!-- Section: Lead Info -->
+                <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-800">
+                    <h3 class="mb-4 text-sm font-semibold text-gray-800 dark:text-white">Lead Information</h3>
+
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-2 max-md:grid-cols-1">
+
+                        <!-- Title (Lead Name) -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label class="required">
+                                Full Name
+                            </x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="text"
+                                name="title"
+                                rules="required"
+                                label="Full Name"
+                                placeholder="Enter full name"
+                            />
+                            <x-admin::form.control-group.error control-name="title" />
+                        </x-admin::form.control-group>
+
+                        <!-- Phone Number (custom attribute) -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                Phone Number
+                            </x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="text"
+                                name="phone_number"
+                                placeholder="+966 5X XXX XXXX"
+                            />
+                            <x-admin::form.control-group.error control-name="phone_number" />
+                        </x-admin::form.control-group>
+
+                        <!-- Email (stored on person) -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                Email
+                            </x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="email"
+                                name="person[emails][0][value]"
+                                placeholder="email@example.com"
+                            />
+                            <input type="hidden" name="person[emails][0][label]" value="work" />
+                            <x-admin::form.control-group.error control-name="person[emails][0][value]" />
+                        </x-admin::form.control-group>
+
+                        <!-- Country -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                Country
+                            </x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="text"
+                                name="country"
+                                placeholder="e.g. Saudi Arabia"
+                            />
+                            <x-admin::form.control-group.error control-name="country" />
+                        </x-admin::form.control-group>
+
+                        <!-- Nationality -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                Nationality
+                            </x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="text"
+                                name="nationality"
+                                placeholder="e.g. Saudi"
+                            />
+                            <x-admin::form.control-group.error control-name="nationality" />
+                        </x-admin::form.control-group>
+
+                        <!-- Source -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label class="required">
+                                Source
+                            </x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="select"
+                                name="lead_source_id"
+                                rules="required"
+                                label="Source"
+                            >
+                                <option value="">-- Select Source --</option>
+                                @foreach (app('Webkul\Lead\Repositories\SourceRepository')->all() as $source)
+                                    <option value="{{ $source->id }}">{{ $source->name }}</option>
+                                @endforeach
+                            </x-admin::form.control-group.control>
+                            <x-admin::form.control-group.error control-name="lead_source_id" />
+                        </x-admin::form.control-group>
+
+                        <!-- Interested Program -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                Interested Program
+                            </x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="text"
+                                name="interested_program"
+                                placeholder="e.g. MBA, Computer Science"
+                            />
+                            <x-admin::form.control-group.error control-name="interested_program" />
+                        </x-admin::form.control-group>
+
+                        <!-- Degree -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                Degree
+                            </x-admin::form.control-group.label>
+                            @php
+                                $degreeAttr = app('Webkul\Attribute\Repositories\AttributeRepository')
+                                    ->findOneWhere(['code' => 'degree', 'entity_type' => 'leads']);
+                            @endphp
+                            <x-admin::form.control-group.control
+                                type="select"
+                                name="degree"
+                            >
+                                <option value="">-- Select Degree --</option>
+                                @if ($degreeAttr)
+                                    @foreach ($degreeAttr->options()->orderBy('sort_order')->get() as $opt)
+                                        <option value="{{ $opt->id }}">{{ $opt->name }}</option>
+                                    @endforeach
+                                @endif
+                            </x-admin::form.control-group.control>
+                            <x-admin::form.control-group.error control-name="degree" />
+                        </x-admin::form.control-group>
+
+                        <!-- Sales Owner -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                Sales Owner
+                            </x-admin::form.control-group.label>
+                            <x-admin::form.control-group.control
+                                type="select"
+                                name="user_id"
+                            >
+                                <option value="">-- Select Sales Owner --</option>
+                                @foreach (app('Webkul\User\Repositories\UserRepository')->all() as $user)
+                                    <option value="{{ $user->id }}" {{ auth()->guard('user')->id() == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </x-admin::form.control-group.control>
+                            <x-admin::form.control-group.error control-name="user_id" />
+                        </x-admin::form.control-group>
+
+                        <!-- Lead Status -->
+                        <x-admin::form.control-group>
+                            <x-admin::form.control-group.label>
+                                Lead Status
+                            </x-admin::form.control-group.label>
+                            @php
+                                $statusAttr = app('Webkul\Attribute\Repositories\AttributeRepository')
+                                    ->findOneWhere(['code' => 'lead_status', 'entity_type' => 'leads']);
+                            @endphp
+                            <x-admin::form.control-group.control
+                                type="select"
+                                name="lead_status"
+                            >
+                                <option value="">-- Select Status --</option>
+                                @if ($statusAttr)
+                                    @foreach ($statusAttr->options()->orderBy('sort_order')->get() as $opt)
+                                        <option value="{{ $opt->id }}">{{ $opt->name }}</option>
+                                    @endforeach
+                                @endif
+                            </x-admin::form.control-group.control>
+                            <x-admin::form.control-group.error control-name="lead_status" />
+                        </x-admin::form.control-group>
+
+                    </div>
+                </div>
+
+                <!-- Hidden required fields with defaults -->
+                <div class="hidden">
+                    <!-- Lead value default 0 -->
+                    <input type="hidden" name="lead_value" value="0" />
+                    <!-- Lead type default first -->
+                    @php $firstType = app('Webkul\Lead\Repositories\TypeRepository')->first(); @endphp
+                    @if ($firstType)
+                        <input type="hidden" name="lead_type_id" value="{{ $firstType->id }}" />
+                    @endif
+                    <!-- Person name mirrors title -->
+                    <input type="hidden" name="person[name]" id="person_name_hidden" value="" />
+                </div>
+
+            </div>
         </div>
     </x-admin::form>
 
     {!! view_render_event('admin.leads.create.form.after') !!}
 
-    @pushOnce('scripts')
-        <script
-            type="text/x-template"
-            id="v-lead-create-template"
-        >
-            <div class="box-shadow flex flex-col gap-4 rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-                {!! view_render_event('admin.leads.edit.form_controls.before') !!}
-
-                <div class="flex w-full gap-2 border-b border-gray-200 dark:border-gray-800">
-                    <!-- Tabs -->
-                    <template
-                        v-for="tab in tabs"
-                        :key="tab.id"
-                    >
-                        {!! view_render_event('admin.leads.create.tabs.before') !!}
-
-                        <a
-                            :href="'#' + tab.id"
-                            :class="[
-                                'inline-block px-3 py-2.5 border-b-2  text-sm font-medium ',
-                                activeTab === tab.id
-                                ? 'text-brandColor border-brandColor dark:brandColor dark:brandColor'
-                                : 'text-gray-600 dark:text-gray-300  border-transparent hover:text-gray-800 hover:border-gray-400 dark:hover:border-gray-400  dark:hover:text-white'
-                            ]"
-                            @click="scrollToSection(tab.id)"
-                            :text="tab.label"
-                        >
-                        </a>
-
-                        {!! view_render_event('admin.leads.create.tabs.after') !!}
-                    </template>
-                </div>
-
-                <div class="flex flex-col gap-4 px-4 py-2">
-                    {!! view_render_event('admin.leads.create.details.before') !!}
-
-                    <!-- Details section -->
-                    <div
-                        class="flex flex-col gap-4"
-                        id="lead-details"
-                    >
-                        <div class="flex flex-col gap-1">
-                            <p class="text-base font-semibold dark:text-white">
-                                @lang('admin::app.leads.create.details')
-                            </p>
-
-                            <p class="text-gray-600 dark:text-white">
-                                @lang('admin::app.leads.create.details-info')
-                            </p>
-                        </div>
-
-                        <div class="w-1/2 max-md:w-full">
-                            {!! view_render_event('admin.leads.create.details.attributes.before') !!}
-
-                            <!-- Lead Details Title and Description -->
-                            <x-admin::attributes
-                                :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
-                                    ['code', 'NOTIN', ['lead_value', 'lead_type_id', 'lead_source_id', 'expected_close_date', 'user_id', 'lead_pipeline_id', 'lead_pipeline_stage_id']],
-                                    'entity_type' => 'leads',
-                                    'quick_add' => 1
-                                ])"
-                                :custom-validations="[
-                                    'expected_close_date' => [
-                                        'date_format:yyyy-MM-dd',
-                                        'after:' .  \Carbon\Carbon::yesterday()->format('Y-m-d')
-                                    ],
-                                ]"
-                            />
-
-                            <!-- Lead Details Other input fields -->
-                            <div class="flex gap-4 max-sm:flex-wrap">
-                                <div class="w-full">
-                                    <x-admin::attributes
-                                        :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
-                                            ['code', 'IN', ['lead_value', 'lead_type_id', 'lead_source_id']],
-                                            'entity_type' => 'leads',
-                                            'quick_add' => 1
-                                        ])"
-                                        :custom-validations="[
-                                            'expected_close_date' => [
-                                                'date_format:yyyy-MM-dd',
-                                                'after:' .  \Carbon\Carbon::yesterday()->format('Y-m-d')
-                                            ],
-                                        ]"
-                                    />
-                                </div>
-
-                                <div class="w-full">
-                                    <x-admin::attributes
-                                        :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
-                                            ['code', 'IN', ['expected_close_date', 'user_id']],
-                                            'entity_type' => 'leads',
-                                            'quick_add' => 1
-                                        ])"
-                                        :custom-validations="[
-                                            'expected_close_date' => [
-                                                'date_format:yyyy-MM-dd',
-                                                'after:' .  \Carbon\Carbon::yesterday()->format('Y-m-d')
-                                            ],
-                                        ]"
-                                    />
-                                </div>
-                            </div>
-
-                            {!! view_render_event('admin.leads.create.details.attributes.after') !!}
-                        </div>
-                    </div>
-
-                    {!! view_render_event('admin.leads.create.details.after') !!}
-
-                    {!! view_render_event('admin.leads.create.contact_person.before') !!}
-
-                    <!-- Contact Person -->
-                    <div
-                        class="flex flex-col gap-4"
-                        id="contact-person"
-                    >
-                        <div class="flex flex-col gap-1">
-                            <p class="text-base font-semibold dark:text-white">
-                                @lang('admin::app.leads.create.contact-person')
-                            </p>
-
-                            <p class="text-gray-600 dark:text-white">
-                                @lang('admin::app.leads.create.contact-info')
-                            </p>
-                        </div>
-
-                        <div class="w-1/2 max-md:w-full">
-                            <!-- Contact Person Component -->
-                            @include('admin::leads.common.contact')
-                        </div>
-                    </div>
-
-                    {!! view_render_event('admin.leads.create.contact_person.after') !!}
-
-                    <!-- Product Section -->
-                    <div
-                        class="flex flex-col gap-4"
-                        id="products"
-                    >
-                        <div class="flex flex-col gap-1">
-                            <p class="text-base font-semibold dark:text-white">
-                                @lang('admin::app.leads.create.products')
-                            </p>
-
-                            <p class="text-gray-600 dark:text-white">
-                                @lang('admin::app.leads.create.products-info')
-                            </p>
-                        </div>
-
-                        <div>
-                            <!-- Product Component -->
-                            @include('admin::leads.common.products')
-                        </div>
-                    </div>
-                </div>
-
-                {!! view_render_event('admin.leads.form_controls.after') !!}
-            </div>
-        </script>
-
-        <script type="module">
-            app.component('v-lead-create', {
-                template: '#v-lead-create-template',
-
-                data() {
-                    return {
-                        activeTab: 'lead-details',
-
-                        tabs: [
-                            { id: 'lead-details', label: '@lang('admin::app.leads.create.details')' },
-                            { id: 'contact-person', label: '@lang('admin::app.leads.create.contact-person')' },
-                            { id: 'products', label: '@lang('admin::app.leads.create.products')' }
-                        ],
-                    };
-                },
-
-                methods: {
-                    /**
-                     * Scroll to the section.
-                     *
-                     * @param {String} tabId
-                     *
-                     * @returns {void}
-                     */
-                    scrollToSection(tabId) {
-                        const section = document.getElementById(tabId);
-
-                        if (section) {
-                            section.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    },
-                },
-            });
-        </script>
-    @endPushOnce
-
-    @pushOnce('styles')
-        <style>
-            html {
-                scroll-behavior: smooth;
+    @push('scripts')
+    <script>
+        // Mirror title into person[name] so contact is auto-created
+        document.addEventListener('DOMContentLoaded', function () {
+            var titleInput = document.querySelector('[name="title"]');
+            var personName = document.getElementById('person_name_hidden');
+            if (titleInput && personName) {
+                titleInput.addEventListener('input', function () {
+                    personName.value = this.value;
+                });
             }
-        </style>
-    @endPushOnce
+        });
+    </script>
+    @endpush
 </x-admin::layouts>
