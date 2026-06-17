@@ -3,176 +3,400 @@
         @lang('admin::app.users.login.title')
     </x-slot>
 
-    <div class="flex min-h-screen">
-        <!-- Left Panel - Branding -->
-        <div class="hidden lg:flex lg:w-1/2 flex-col items-center justify-center relative overflow-hidden"
-             style="background: linear-gradient(135deg, #0E90D9 0%, #0a6fa8 50%, #064e7a 100%);">
+    @push('styles')
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; }
+        #app { height: 100%; }
 
-            <!-- Background decoration circles -->
-            <div class="absolute top-[-80px] left-[-80px] w-[320px] h-[320px] rounded-full opacity-10"
-                 style="background: white;"></div>
-            <div class="absolute bottom-[-60px] right-[-60px] w-[260px] h-[260px] rounded-full opacity-10"
-                 style="background: white;"></div>
-            <div class="absolute top-1/2 left-[-40px] w-[160px] h-[160px] rounded-full opacity-5"
-                 style="background: white;"></div>
+        .login-wrapper {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+        }
 
-            <div class="relative z-10 flex flex-col items-center gap-8 px-12 text-center">
-                <!-- Logo -->
+        /* ── Left branding panel ── */
+        .login-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #0a6fa8 0%, #0E90D9 45%, #38b6ff 100%);
+            padding: 48px 40px;
+        }
+
+        .login-left::before {
+            content: '';
+            position: absolute;
+            top: -120px; right: -120px;
+            width: 400px; height: 400px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+        .login-left::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -80px;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .login-left-inner {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 32px;
+        }
+
+        .login-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.15);
+            padding: 16px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        }
+
+        .login-brand-name {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+
+        .login-brand-tagline {
+            font-size: 15px;
+            color: rgba(255,255,255,0.80);
+            line-height: 1.7;
+            max-width: 280px;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .login-features {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .login-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 12px;
+            padding: 12px 16px;
+            backdrop-filter: blur(4px);
+        }
+
+        .login-feature-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .login-feature-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.90);
+            font-weight: 500;
+        }
+
+        /* ── Right form panel ── */
+        .login-right {
+            width: 480px;
+            min-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            padding: 48px 52px;
+            box-shadow: -4px 0 30px rgba(0,0,0,0.06);
+        }
+
+        .login-form-box {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .login-form-header {
+            margin-bottom: 36px;
+        }
+
+        .login-form-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 6px;
+        }
+
+        .login-form-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .login-field {
+            margin-bottom: 20px;
+        }
+
+        .login-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .login-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .login-label .req {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+
+        .login-forgot {
+            font-size: 12px;
+            font-weight: 500;
+            color: #0E90D9;
+            text-decoration: none;
+        }
+        .login-forgot:hover { text-decoration: underline; }
+
+        .login-input-wrap {
+            position: relative;
+        }
+
+        .login-input-wrap input,
+        .login-input-wrap [type="email"],
+        .login-input-wrap [type="password"],
+        .login-input-wrap [type="text"] {
+            width: 100% !important;
+            padding: 11px 16px !important;
+            border: 1.5px solid #e5e7eb !important;
+            border-radius: 10px !important;
+            font-size: 14px !important;
+            color: #111827 !important;
+            background: #f9fafb !important;
+            outline: none !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+            box-sizing: border-box !important;
+        }
+
+        .login-input-wrap input:focus,
+        .login-input-wrap [type="email"]:focus,
+        .login-input-wrap [type="password"]:focus,
+        .login-input-wrap [type="text"]:focus {
+            border-color: #0E90D9 !important;
+            box-shadow: 0 0 0 3px rgba(14,144,217,0.12) !important;
+            background: #ffffff !important;
+        }
+
+        .login-eye-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #9ca3af;
+            background: none;
+            border: none;
+            padding: 0;
+            line-height: 1;
+        }
+        .login-eye-btn:hover { color: #374151; }
+
+        .login-submit-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            margin-top: 8px;
+            letter-spacing: 0.2px;
+            transition: opacity 0.2s, transform 0.1s;
+            background: linear-gradient(135deg, #0E90D9, #0a6fa8);
+            box-shadow: 0 4px 14px rgba(14,144,217,0.35);
+        }
+        .login-submit-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+        .login-submit-btn:active { transform: translateY(0); }
+
+        .login-footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        /* Responsive: stack on small screens */
+        @media (max-width: 900px) {
+            .login-wrapper { flex-direction: column; height: auto; min-height: 100vh; }
+            .login-left { padding: 40px 24px; flex: none; }
+            .login-right { width: 100%; min-width: unset; padding: 36px 24px; box-shadow: none; }
+        }
+    </style>
+    @endpush
+
+    <div class="login-wrapper">
+
+        <!-- ── Left: Branding ── -->
+        <div class="login-left">
+            <div class="login-left-inner">
+
                 @if ($logo = core()->getConfigData('general.design.admin_logo.logo_image'))
-                    <img class="h-20 object-contain drop-shadow-lg" src="{{ Storage::url($logo) }}" alt="{{ config('app.name') }}" />
+                    <img class="login-logo" src="{{ Storage::url($logo) }}" alt="{{ config('app.name') }}" />
                 @else
-                    <img class="h-20 object-contain drop-shadow-lg" src="{{ asset('Apx.jpeg') }}" alt="{{ config('app.name') }}" />
+                    <img class="login-logo" src="{{ asset('Apx.jpeg') }}" alt="{{ config('app.name') }}" />
                 @endif
 
-                <div class="flex flex-col gap-3">
-                    <h1 class="text-4xl font-bold text-white tracking-tight">
-                        {{ config('app.name') }}
-                    </h1>
-                    <p class="text-lg text-blue-100 font-light max-w-xs leading-relaxed">
-                        Manage your leads, contacts, and pipelines all in one place.
-                    </p>
+                <div>
+                    <p class="login-brand-name">{{ config('app.name') }}</p>
                 </div>
 
-                <!-- Feature bullets -->
-                <div class="flex flex-col gap-3 mt-4">
-                    @foreach ([
-                        ['icon' => '⚡', 'text' => 'Fast & Intuitive CRM'],
-                        ['icon' => '📊', 'text' => 'Pipeline Analytics'],
-                        ['icon' => '🔒', 'text' => 'Role-Based Access'],
-                    ] as $item)
-                        <div class="flex items-center gap-3 text-blue-100">
-                            <span class="text-xl">{{ $item['icon'] }}</span>
-                            <span class="text-sm font-medium">{{ $item['text'] }}</span>
-                        </div>
-                    @endforeach
+                <p class="login-brand-tagline">
+                    Manage your leads, contacts, and sales pipelines — all in one powerful platform.
+                </p>
+
+                <div class="login-features">
+                    <div class="login-feature-item">
+                        <span class="login-feature-icon">⚡</span>
+                        <span class="login-feature-text">Fast & Intuitive CRM</span>
+                    </div>
+                    <div class="login-feature-item">
+                        <span class="login-feature-icon">📊</span>
+                        <span class="login-feature-text">Pipeline & Lead Analytics</span>
+                    </div>
+                    <div class="login-feature-item">
+                        <span class="login-feature-icon">🔒</span>
+                        <span class="login-feature-text">Role-Based Access Control</span>
+                    </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- Right Panel - Login Form -->
-        <div class="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 bg-white dark:bg-gray-950">
+        <!-- ── Right: Login Form ── -->
+        <div class="login-right">
+            <div class="login-form-box">
 
-            <div class="w-full max-w-sm">
-                <!-- Mobile logo (shown only on small screens) -->
-                <div class="flex justify-center mb-8 lg:hidden">
-                    @if ($logo = core()->getConfigData('general.design.admin_logo.logo_image'))
-                        <img class="h-14 object-contain" src="{{ Storage::url($logo) }}" alt="{{ config('app.name') }}" />
-                    @else
-                        <img class="h-14 object-contain" src="{{ asset('Apx.jpeg') }}" alt="{{ config('app.name') }}" />
-                    @endif
+                <div class="login-form-header">
+                    <h1 class="login-form-title">Welcome back</h1>
+                    <p class="login-form-subtitle">Sign in to your account to continue</p>
                 </div>
 
-                <!-- Header -->
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                        Welcome back
-                    </h2>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Sign in to your account to continue
-                    </p>
-                </div>
-
-                <!-- Flash errors -->
                 @if (session('error'))
-                    <div class="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
-                        <span class="text-base">⚠️</span>
-                        {{ session('error') }}
+                    <div style="margin-bottom:20px; padding:12px 16px; background:#fef2f2; border:1px solid #fecaca; border-radius:10px; font-size:13px; color:#dc2626;">
+                        ⚠️ {{ session('error') }}
                     </div>
                 @endif
 
                 {!! view_render_event('admin.sessions.login.form_controls.before') !!}
 
-                <!-- Login Form -->
                 <x-admin::form :action="route('admin.session.store')">
-                    <div class="flex flex-col gap-5">
-                        <!-- Email -->
-                        <x-admin::form.control-group>
-                            <x-admin::form.control-group.label class="required text-sm font-medium text-gray-700 dark:text-gray-300">
-                                @lang('admin::app.users.login.email')
-                            </x-admin::form.control-group.label>
 
+                    <!-- Email Field -->
+                    <div class="login-field">
+                        <div class="login-label-row">
+                            <label class="login-label" for="email">
+                                @lang('admin::app.users.login.email') <span class="req">*</span>
+                            </label>
+                        </div>
+                        <div class="login-input-wrap">
                             <x-admin::form.control-group.control
                                 type="email"
-                                class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 focus:border-brandColor focus:ring-1 focus:ring-brandColor dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                                 id="email"
                                 name="email"
                                 rules="required|email"
                                 :label="trans('admin::app.users.login.email')"
-                                :placeholder="trans('admin::app.users.login.email')"
+                                placeholder="you@example.com"
                             />
-
-                            <x-admin::form.control-group.error control-name="email" />
-                        </x-admin::form.control-group>
-
-                        <!-- Password -->
-                        <x-admin::form.control-group class="relative">
-                            <div class="flex items-center justify-between">
-                                <x-admin::form.control-group.label class="required text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    @lang('admin::app.users.login.password')
-                                </x-admin::form.control-group.label>
-
-                                <a
-                                    href="{{ route('admin.forgot_password.create') }}"
-                                    class="text-xs font-medium text-brandColor hover:underline"
-                                >
-                                    @lang('admin::app.users.login.forget-password-link')
-                                </a>
-                            </div>
-
-                            <div class="relative">
-                                <x-admin::form.control-group.control
-                                    type="password"
-                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 pr-11 text-sm text-gray-900 focus:border-brandColor focus:ring-1 focus:ring-brandColor dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                                    id="password"
-                                    name="password"
-                                    rules="required|min:6"
-                                    :label="trans('admin::app.users.login.password')"
-                                    :placeholder="trans('admin::app.users.login.password')"
-                                />
-
-                                <span
-                                    class="icon-eye-hide absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-xl text-gray-400 hover:text-gray-600"
-                                    onclick="switchVisibility()"
-                                    id="visibilityIcon"
-                                    role="presentation"
-                                    tabindex="0"
-                                ></span>
-                            </div>
-
-                            <x-admin::form.control-group.error control-name="password" />
-                        </x-admin::form.control-group>
-
-                        <!-- Submit Button -->
-                        <button
-                            type="submit"
-                            class="mt-2 w-full rounded-lg px-4 py-3 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-brandColor focus:ring-offset-2"
-                            style="background-color: var(--brand-color);"
-                            aria-label="{{ trans('admin::app.users.login.submit-btn') }}"
-                        >
-                            @lang('admin::app.users.login.submit-btn')
-                        </button>
+                        </div>
+                        <x-admin::form.control-group.error control-name="email" />
                     </div>
+
+                    <!-- Password Field -->
+                    <div class="login-field">
+                        <div class="login-label-row">
+                            <label class="login-label" for="password">
+                                @lang('admin::app.users.login.password') <span class="req">*</span>
+                            </label>
+                            <a class="login-forgot" href="{{ route('admin.forgot_password.create') }}">
+                                @lang('admin::app.users.login.forget-password-link')
+                            </a>
+                        </div>
+                        <div class="login-input-wrap">
+                            <x-admin::form.control-group.control
+                                type="password"
+                                id="password"
+                                name="password"
+                                rules="required|min:6"
+                                :label="trans('admin::app.users.login.password')"
+                                :placeholder="trans('admin::app.users.login.password')"
+                            />
+                            <span
+                                class="login-eye-btn icon-eye-hide"
+                                onclick="switchVisibility()"
+                                id="visibilityIcon"
+                                role="button"
+                                tabindex="0"
+                            ></span>
+                        </div>
+                        <x-admin::form.control-group.error control-name="password" />
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="login-submit-btn" aria-label="{{ trans('admin::app.users.login.submit-btn') }}">
+                        @lang('admin::app.users.login.submit-btn')
+                    </button>
+
                 </x-admin::form>
 
                 {!! view_render_event('admin.sessions.login.form_controls.after') !!}
 
-                <!-- Footer -->
-                <p class="mt-8 text-center text-xs text-gray-400 dark:text-gray-600">
+                <div class="login-footer">
                     &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
-                </p>
+                </div>
+
             </div>
         </div>
+
     </div>
 
     @push('scripts')
-        <script>
-            function switchVisibility() {
-                let passwordField = document.getElementById("password");
-                let visibilityIcon = document.getElementById("visibilityIcon");
-                passwordField.type = passwordField.type === "password" ? "text" : "password";
-                visibilityIcon.classList.toggle("icon-eye");
-                visibilityIcon.classList.toggle("icon-eye-hide");
+    <script>
+        function switchVisibility() {
+            var f = document.getElementById('password');
+            var i = document.getElementById('visibilityIcon');
+            if (f.type === 'password') {
+                f.type = 'text';
+                i.classList.remove('icon-eye-hide');
+                i.classList.add('icon-eye');
+            } else {
+                f.type = 'password';
+                i.classList.remove('icon-eye');
+                i.classList.add('icon-eye-hide');
             }
-        </script>
+        }
+    </script>
     @endpush
+
 </x-admin::layouts.anonymous>
