@@ -275,6 +275,22 @@
         </script>
 
         <script type="module">
+            window.onerror = function(msg, src, line, col, err) {
+                console.error('[PIPELINE ERROR]', msg, '\nFile:', src, '\nLine:', line, '\nError:', err);
+            };
+
+            window.addEventListener('unhandledrejection', function(e) {
+                console.error('[PIPELINE PROMISE ERROR]', e.reason);
+            });
+
+            app.config.errorHandler = function(err, instance, info) {
+                console.error('[VUE ERROR]', err, '\nInfo:', info);
+            };
+
+            app.config.warnHandler = function(msg, instance, trace) {
+                console.warn('[VUE WARN]', msg, '\nTrace:', trace);
+            };
+
             app.component('v-stages-component', {
                 template: '#v-stages-component-template',
 

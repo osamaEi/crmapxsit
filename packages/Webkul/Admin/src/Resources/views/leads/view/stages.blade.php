@@ -314,8 +314,10 @@
                                 this.$axios.post("{{ route('admin.activities.store') }}", {
                                     type: 'note',
                                     lead_id: {{ $lead->id }},
+                                    title: 'Stage → ' + stage.name,
                                     comment: comment,
-                                }).then(() => {
+                                }).then((noteResponse) => {
+                                    this.$emitter.emit('on-activity-added', noteResponse.data.data);
                                     this.$parent.$refs.activities.get();
                                 });
                             } else {
