@@ -70,6 +70,10 @@ class PipelineRepository extends Repository
 
         $pipeline->update($data);
 
+        if (empty($data['stages'])) {
+            return $pipeline;
+        }
+
         $previousStageIds = $pipeline->stages()->pluck('id');
 
         foreach ($data['stages'] as $stageId => $stageData) {

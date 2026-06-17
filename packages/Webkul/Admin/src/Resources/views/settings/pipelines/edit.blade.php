@@ -370,17 +370,7 @@
                     },
 
                     removeUniqueNameErrors() {
-                        if (
-                            ! this.isDuplicateStageNameExists()
-                            && this.errors
-                            && Array.isArray(this.errors.items)
-                        ) {
-                            const uniqueNameErrorIds = this.errors.items
-                                .filter(error => error.rule === 'unique_name')
-                                .map(error => error.id);
-
-                            uniqueNameErrorIds.forEach(id => this.errors.removeById(id));
-                        }
+                        // no-op: vee-validate v4 clears errors automatically on re-validation
                     },
 
                     handleDragging(event) {
