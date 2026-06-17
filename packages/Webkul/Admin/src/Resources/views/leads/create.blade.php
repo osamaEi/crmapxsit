@@ -216,8 +216,10 @@
                     @if ($firstType)
                         <input type="hidden" name="lead_type_id" value="{{ $firstType->id }}" />
                     @endif
-                    <!-- Person name mirrors title -->
+                    <!-- Person name mirrors title - synced on submit -->
                     <input type="hidden" name="person[name]" id="person_name_hidden" value="" />
+                    <!-- entity_type required by AttributeValueRepository -->
+                    <input type="hidden" name="entity_type" value="leads" />
                 </div>
 
             </div>
@@ -228,14 +230,23 @@
 
     @push('scripts')
     <script>
-        // Mirror title into person[name] so contact is auto-created
         document.addEventListener('DOMContentLoaded', function () {
             var titleInput = document.querySelector('[name="title"]');
             var personName = document.getElementById('person_name_hidden');
-            if (titleInput && personName) {
-                titleInput.addEventListener('input', function () {
-                    personName.value = this.value;
-                });
+            var form       = titleInput ? titleInput.closest('form') : null;
+
+            function syncName() {
+                if (titleInput && personName) {
+                    personName.value = titleInput.value;
+                }
+            }
+
+            if (titleInput) {
+                titleInput.addEventListener('input', syncName);
+            }
+            // Also sync right before submit so nothing is missed
+            if (form) {
+                form.addEventListener('submit', syncName);
             }
         });
     </script>

@@ -219,6 +219,7 @@
 
                 <!-- Hidden required fields -->
                 <div class="hidden">
+                    <input type="hidden" name="entity_type" value="leads" />
                     <input type="hidden" name="lead_value" value="{{ $lead->lead_value ?? 0 }}" />
                     @php $firstType = app('Webkul\Lead\Repositories\TypeRepository')->first(); @endphp
                     @if ($firstType)
