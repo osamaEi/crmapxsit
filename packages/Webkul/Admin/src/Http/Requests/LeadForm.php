@@ -134,6 +134,9 @@ class LeadForm extends FormRequest
             'after:'.Carbon::yesterday()->format('Y-m-d'),
         ];
 
+        // person.name is mirrored from the lead title — never require it independently
+        $this->rules['person.name'] = ['nullable', 'string', 'max:255'];
+
         return [
             ...$this->rules,
             'products' => 'array',

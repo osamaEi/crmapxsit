@@ -117,6 +117,11 @@ class LeadRepository extends Repository
          * If a person is provided, create or update the person and set the `person_id`.
          */
         if (isset($data['person'])) {
+            // Ensure person name always has a value — fall back to the lead title
+            if (empty($data['person']['name'])) {
+                $data['person']['name'] = $data['title'] ?? 'Lead';
+            }
+
             if (! empty($data['person']['id'])) {
                 $person = $this->personRepository->findOrFail($data['person']['id']);
             } else {
@@ -168,6 +173,10 @@ class LeadRepository extends Repository
          * For example, in the lead Kanban section, when switching stages, only the stage will be updated.
          */
         if (isset($data['person'])) {
+            if (empty($data['person']['name'])) {
+                $data['person']['name'] = $data['title'] ?? 'Lead';
+            }
+
             if (! empty($data['person']['id'])) {
                 $person = $this->personRepository->findOrFail($data['person']['id']);
             } else {

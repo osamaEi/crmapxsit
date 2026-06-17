@@ -228,8 +228,8 @@
                     @if ($firstType)
                         <input type="hidden" name="lead_type_id" value="{{ $firstType->id }}" />
                     @endif
-                    <!-- Person name mirrors title - synced on submit -->
-                    <input type="hidden" name="person[name]" id="person_name_hidden" value="" />
+                    <!-- Person name: pre-filled with old title, kept in sync by JS -->
+                    <input type="hidden" name="person[name]" id="person_name_hidden" value="{{ old('title', '') }}" />
                     <!-- entity_type required by AttributeValueRepository -->
                     <input type="hidden" name="entity_type" value="leads" />
                 </div>
@@ -245,21 +245,24 @@
         document.addEventListener('DOMContentLoaded', function () {
             var titleInput = document.querySelector('[name="title"]');
             var personName = document.getElementById('person_name_hidden');
-            var form       = titleInput ? titleInput.closest('form') : null;
 
             function syncName() {
                 if (titleInput && personName) {
-                    personName.value = titleInput.value;
+                    personName.value = titleInput.value.trim() || 'Lead';
                 }
             }
 
             if (titleInput) {
+                // Sync on every keystroke
                 titleInput.addEventListener('input', syncName);
+                // Sync immediately so the hidden field is never empty on first render
+                syncName();
             }
-            // Also sync right before submit so nothing is missed
-            if (form) {
-                form.addEventListener('submit', syncName);
-            }
+
+            // Sync on any click of the submit button (fires before VeeValidate)
+            document.querySelectorAll('[type="submit"]').forEach(function (btn) {
+                btn.addEventListener('click', syncName, true);
+            });
         });
     </script>
     @endpush
