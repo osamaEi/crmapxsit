@@ -5,6 +5,18 @@
 
     {!! view_render_event('admin.leads.edit.form_controls.before', ['lead' => $lead]) !!}
 
+    {{-- Validation error summary --}}
+    @if ($errors->any())
+        <div class="mx-auto mb-2 w-full max-w-screen-xl rounded-lg border border-red-200 bg-red-50 px-5 py-4 dark:border-red-800 dark:bg-red-900/20">
+            <p class="mb-2 text-sm font-semibold text-red-700 dark:text-red-400">Please fix the following errors:</p>
+            <ul class="list-disc pl-5 text-sm text-red-600 dark:text-red-400">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <x-admin::form
         :action="route('admin.leads.update', $lead->id)"
         method="PUT"
