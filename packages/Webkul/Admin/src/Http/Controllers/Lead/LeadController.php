@@ -346,9 +346,41 @@ class LeadController extends Controller
 
         Event::dispatch('lead.update.after', $lead);
 
+        // Log stage change to history
+        \Illuminate\Support\Facades\DB::table('lead_stage_history')->insert([
+            'lead_id'    => $lead->id,
+            'stage_id'   => $stage->id,
+            'stage_name' => $stage->name,
+            'user_id'    => auth()->guard('user')->id(),
+            'comment'    => request()->input('lost_reason') ?: null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         return response()->json([
             'message' => trans('admin::app.leads.update-success'),
         ]);
+    }
+
+    /**
+     * Return stage change history for a lead.
+     */
+    public function stageHistory(int $id): JsonResponse
+    {
+        $history = \Illuminate\Support\Facades\DB::table('lead_stage_history')
+            ->leftJoin('users', 'lead_stage_history.user_id', '=', 'users.id')
+            ->where('lead_stage_history.lead_id', $id)
+            ->orderByDesc('lead_stage_history.created_at')
+            ->select([
+                'lead_stage_history.id',
+                'lead_stage_history.stage_name',
+                'lead_stage_history.comment',
+                'lead_stage_history.created_at',
+                'users.name as user_name',
+            ])
+            ->get();
+
+        return response()->json($history);
     }
 
     /**

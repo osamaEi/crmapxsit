@@ -46,6 +46,8 @@ Route::controller(LeadController::class)->prefix('leads')->group(function () {
         Route::get('', 'index')->name('admin.leads.activities.index');
     });
 
+    Route::get('{id}/stage-history', [LeadController::class, 'stageHistory'])->name('admin.leads.stage.history');
+
     Route::controller(TagController::class)->prefix('{id}/tags')->group(function () {
         Route::post('', 'attach')->name('admin.leads.tags.attach');
 
