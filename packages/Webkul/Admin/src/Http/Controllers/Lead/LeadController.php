@@ -116,14 +116,14 @@ class LeadController extends Controller
             if ($q !== '') {
                 $query->where(function ($w) use ($q) {
                     $w->where('leads.title', 'like', "%{$q}%")
-                      ->orWhereHas('person', function ($p) use ($q) {
-                          $p->where('name', 'like', "%{$q}%")
-                            ->orWhereRaw("JSON_SEARCH(LOWER(emails), 'one', LOWER(?)) IS NOT NULL", ["%{$q}%"]);
-                      })
-                      ->orWhereHas('attribute_values', function ($av) use ($q) {
-                          $av->where('text_value', 'like', "%{$q}%")
-                             ->whereHas('attribute', fn($a) => $a->where('code', 'phone_number'));
-                      });
+                        ->orWhereHas('person', function ($p) use ($q) {
+                            $p->where('name', 'like', "%{$q}%")
+                                ->orWhereRaw("JSON_SEARCH(LOWER(emails), 'one', LOWER(?)) IS NOT NULL", ["%{$q}%"]);
+                        })
+                        ->orWhereHas('attribute_values', function ($av) use ($q) {
+                            $av->where('text_value', 'like', "%{$q}%")
+                                ->whereHas('attribute', fn ($a) => $a->where('code', 'phone_number'));
+                        });
                 });
             }
 
