@@ -94,6 +94,8 @@ class LeadController extends Controller
             $stages = $pipeline->stages;
         }
 
+        $q = trim((string) request()->query('q', ''));
+
         foreach ($stages as $stage) {
             /**
              * We have to create a new instance of the lead repository every time, which is
@@ -108,6 +110,21 @@ class LeadController extends Controller
 
             if ($userIds = bouncer()->getAuthorizedUserIds()) {
                 $query->whereIn('leads.user_id', $userIds);
+            }
+
+            // Global search: name, phone, email
+            if ($q !== '') {
+                $query->where(function ($w) use ($q) {
+                    $w->where('leads.title', 'like', "%{$q}%")
+                      ->orWhereHas('person', function ($p) use ($q) {
+                          $p->where('name', 'like', "%{$q}%")
+                            ->orWhereRaw("JSON_SEARCH(LOWER(emails), 'one', LOWER(?)) IS NOT NULL", ["%{$q}%"]);
+                      })
+                      ->orWhereHas('attribute_values', function ($av) use ($q) {
+                          $av->where('text_value', 'like', "%{$q}%")
+                             ->whereHas('attribute', fn($a) => $a->where('code', 'phone_number'));
+                      });
+                });
             }
 
             $stage->lead_value = (clone $query)->sum('lead_value');

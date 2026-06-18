@@ -24,6 +24,7 @@
         <template v-else>
             <div class="flex flex-col gap-4">
                 @include('admin::leads.index.kanban.toolbar')
+                <!-- quickSearch handled below -->
 
                 {!! view_render_event('admin.leads.index.kanban.content.before') !!}
 
@@ -354,6 +355,8 @@
 
                     isLoading: true,
 
+                    quickSearchQuery: '',
+
                     tagTextColor: {
                         '#FEE2E2': '#DC2626',
                         '#FFEDD5': '#EA580C',
@@ -432,6 +435,7 @@
                         searchFields: '',
                         pipeline_id: "{{ request('pipeline_id') }}",
                         limit: 10,
+                        q: this.quickSearchQuery,
                     };
 
                     this.applied.filters.columns.forEach((column) => {
@@ -474,6 +478,23 @@
                         })
                         .catch(error => {
                             console.log(error)
+                        });
+                },
+
+                /**
+                 * Quick search by name / phone / email via the q param.
+                 *
+                 * @param {string} term
+                 * @returns {void}
+                 */
+                quickSearch(term) {
+                    this.quickSearchQuery = term;
+
+                    this.get()
+                        .then(response => {
+                            for (let [sortOrder, data] of Object.entries(response.data)) {
+                                this.stageLeads[sortOrder] = data;
+                            }
                         });
                 },
 
