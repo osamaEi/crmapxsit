@@ -115,73 +115,86 @@
             @include ('admin::leads.view.stages')
 
             <!-- Stage History -->
-            <div
-                class="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
-                x-data="stageHistory({{ $lead->id }})"
-                x-init="load()"
-            >
-                <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-800">
-                    <h3 class="text-sm font-semibold dark:text-white">Stage History</h3>
-                    <button
-                        @click="open = !open"
-                        class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                        x-text="open ? 'Hide' : 'Show'"
-                    ></button>
-                </div>
+            <v-stage-history lead-id="{{ $lead->id }}"></v-stage-history>
 
-                <div x-show="open" x-transition>
-                    <div x-show="loading" class="flex items-center justify-center py-6">
-                        <span class="text-xs text-gray-400">Loading...</span>
+            @pushOnce('scripts')
+            <script type="text/x-template" id="v-stage-history-template">
+                <div class="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+                    <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+                        <h3 class="text-sm font-semibold dark:text-white">Stage History</h3>
+                        <button
+                            @click="open = !open"
+                            class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                            @{{ open ? 'Hide' : 'Show' }}
+                        </button>
                     </div>
 
-                    <div x-show="!loading && history.length === 0" class="px-4 py-5 text-center text-xs text-gray-400">
-                        No stage changes recorded yet.
-                    </div>
+                    <div v-show="open">
+                        <div v-if="loading" class="flex items-center justify-center py-6">
+                            <span class="text-xs text-gray-400">Loading...</span>
+                        </div>
 
-                    <ul x-show="!loading && history.length > 0" class="divide-y divide-gray-100 dark:divide-gray-800">
-                        <template x-for="item in history" :key="item.id">
-                            <li class="flex items-start gap-3 px-4 py-3">
-                                <!-- dot -->
+                        <div v-else-if="history.length === 0" class="px-4 py-5 text-center text-xs text-gray-400">
+                            No stage changes recorded yet.
+                        </div>
+
+                        <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
+                            <li
+                                v-for="item in history"
+                                :key="item.id"
+                                class="flex items-start gap-3 px-4 py-3"
+                            >
                                 <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brandColor"></span>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex flex-wrap items-baseline gap-2">
-                                        <span class="text-xs font-semibold text-gray-800 dark:text-gray-200" x-text="item.stage_name"></span>
-                                        <span class="text-[10px] text-gray-400" x-text="item.user_name ? 'by ' + item.user_name : ''"></span>
-                                        <span class="ml-auto text-[10px] text-gray-400" x-text="formatDate(item.created_at)"></span>
+                                        <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">@{{ item.stage_name }}</span>
+                                        <span v-if="item.user_name" class="text-[10px] text-gray-400">by @{{ item.user_name }}</span>
+                                        <span class="ml-auto text-[10px] text-gray-400">@{{ formatDate(item.created_at) }}</span>
                                     </div>
-                                    <p x-show="item.comment" class="mt-0.5 text-xs text-gray-500 dark:text-gray-400" x-text="item.comment"></p>
+                                    <p v-if="item.comment" class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">@{{ item.comment }}</p>
                                 </div>
                             </li>
-                        </template>
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-
-            @push('scripts')
-            <script>
-            function stageHistory(leadId) {
-                return {
-                    open: true,
-                    loading: false,
-                    history: [],
-                    load() {
-                        this.loading = true;
-                        fetch(`/admin/leads/${leadId}/stage-history`, {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        })
-                        .then(r => r.json())
-                        .then(data => { this.history = data; })
-                        .finally(() => { this.loading = false; });
-                    },
-                    formatDate(dt) {
-                        if (!dt) return '';
-                        const d = new Date(dt);
-                        return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                    }
-                };
-            }
             </script>
-            @endpush
+
+            <script type="module">
+                app.component('v-stage-history', {
+                    template: '#v-stage-history-template',
+
+                    props: ['leadId'],
+
+                    data() {
+                        return {
+                            open: true,
+                            loading: false,
+                            history: [],
+                        };
+                    },
+
+                    mounted() {
+                        this.load();
+                    },
+
+                    methods: {
+                        load() {
+                            this.loading = true;
+                            this.$axios.get(`/admin/leads/${this.leadId}/stage-history`)
+                                .then(r => { this.history = r.data; })
+                                .finally(() => { this.loading = false; });
+                        },
+
+                        formatDate(dt) {
+                            if (!dt) return '';
+                            const d = new Date(dt);
+                            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        },
+                    },
+                });
+            </script>
+            @endPushOnce
 
             <!-- Activities -->
             {!! view_render_event('admin.leads.view.activities.before', ['lead' => $lead]) !!}
