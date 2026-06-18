@@ -8,6 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Drop if exists from a previously failed migration run
+        Schema::dropIfExists('lead_stage_history');
+
         Schema::create('lead_stage_history', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('lead_id');
