@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
@@ -347,12 +348,12 @@ class LeadController extends Controller
         Event::dispatch('lead.update.after', $lead);
 
         // Log stage change to history
-        \Illuminate\Support\Facades\DB::table('lead_stage_history')->insert([
-            'lead_id'    => $lead->id,
-            'stage_id'   => $stage->id,
+        DB::table('lead_stage_history')->insert([
+            'lead_id' => $lead->id,
+            'stage_id' => $stage->id,
             'stage_name' => $stage->name,
-            'user_id'    => auth()->guard('user')->id(),
-            'comment'    => request()->input('lost_reason') ?: null,
+            'user_id' => auth()->guard('user')->id(),
+            'comment' => request()->input('lost_reason') ?: null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -367,7 +368,7 @@ class LeadController extends Controller
      */
     public function stageHistory(int $id): JsonResponse
     {
-        $history = \Illuminate\Support\Facades\DB::table('lead_stage_history')
+        $history = DB::table('lead_stage_history')
             ->leftJoin('users', 'lead_stage_history.user_id', '=', 'users.id')
             ->where('lead_stage_history.lead_id', $id)
             ->orderByDesc('lead_stage_history.created_at')
