@@ -203,21 +203,28 @@
                                         {!! view_render_event('admin.settings.pipelines.edit.form.stages.probability.before', ['pipeline' => $pipeline]) !!}
 
                                         <!-- Probability -->
-                                        <x-admin::form.control-group>
-                                            <x-admin::form.control-group.label class="required">
+                                        <div class="mb-4">
+                                            <label class="mb-1.5 block text-xs font-medium text-gray-800 dark:text-white required">
                                                 @lang('admin::app.settings.pipelines.edit.probability')
-                                            </x-admin::form.control-group.label>
-
-                                            <x-admin::form.control-group.control
-                                                type="text"
-                                                ::name="'stages[' + element.id + '][probability]'"
+                                            </label>
+                                            <v-field
+                                                v-slot="{ field, errors }"
+                                                :name="'stages[' + element.id + '][probability]'"
                                                 v-model="element['probability']"
                                                 rules="required|numeric|min_value:0|max_value:100"
-                                                ::readonly="element.code && element.code != 'new'"
-                                                :label="trans('admin::app.settings.pipelines.create.probability')"
-                                            />
-                                            <x-admin::form.control-group.error ::name="'stages[' + element.id + '][probability]'" />
-                                        </x-admin::form.control-group>
+                                                label="{{ trans('admin::app.settings.pipelines.create.probability') }}"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    v-bind="field"
+                                                    :name="'stages[' + element.id + '][probability]'"
+                                                    :readonly="element.code && element.code != 'new'"
+                                                    :class="[errors.length ? 'border !border-red-600' : '', element.code && element.code != 'new' ? 'bg-gray-100 cursor-not-allowed' : '']"
+                                                    class="w-full rounded border border-gray-200 px-2.5 py-2 text-sm font-normal text-gray-800 transition-all hover:border-gray-400 focus:border-gray-400 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"
+                                                />
+                                            </v-field>
+                                            <v-error-message :name="'stages[' + element.id + '][probability]'" class="mt-1 text-xs italic text-red-600" />
+                                        </div>
 
                                         {!! view_render_event('admin.settings.pipelines.edit.form.stages.probability.after', ['pipeline' => $pipeline]) !!}
                                     </div>
