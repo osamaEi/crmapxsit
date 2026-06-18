@@ -182,21 +182,27 @@
                                         {!! view_render_event('admin.settings.pipelines.edit.form.stages.name.before', ['pipeline' => $pipeline]) !!}
 
                                         <!-- Name -->
-                                        <x-admin::form.control-group>
-                                            <x-admin::form.control-group.label class="required">
-                                                @lang('admin::app.settings.pipelines.edit.name')
-                                            </x-admin::form.control-group.label>
-                                            
-                                            <x-admin::form.control-group.control
-                                                type="text"
-                                                ::name="'stages[' + element.id + '][name]'"
+                                        <div class="mb-4">
+                                            <label class="mb-1.5 block text-xs font-medium text-gray-800 dark:text-white required">
+                                                {{ trans('admin::app.settings.pipelines.edit.name') }}
+                                            </label>
+                                            <v-field
+                                                v-slot="{ field, errors }"
+                                                :name="'stages[' + element.id + '][name]'"
                                                 v-model="element['name']"
-                                                ::rules="{ required: true, unique_name: stages, min: 0, max: 100 }"
-                                                :label="trans('admin::app.settings.pipelines.edit.name')"
-                                            />
-
-                                            <x-admin::form.control-group.error ::name="'stages[' + element.id + '][name]'" />
-                                        </x-admin::form.control-group>
+                                                :rules="{ required: true, unique_name: stages, min: 0, max: 100 }"
+                                                label="{{ trans('admin::app.settings.pipelines.edit.name') }}"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    v-bind="field"
+                                                    :name="'stages[' + element.id + '][name]'"
+                                                    :class="[errors.length ? 'border !border-red-600' : '']"
+                                                    class="w-full rounded border border-gray-200 px-2.5 py-2 text-sm font-normal text-gray-800 transition-all hover:border-gray-400 focus:border-gray-400 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"
+                                                />
+                                            </v-field>
+                                            <v-error-message :name="'stages[' + element.id + '][name]'" class="mt-1 text-xs italic text-red-600" />
+                                        </div>
 
                                         {!! view_render_event('admin.settings.pipelines.edit.form.stages.name.after', ['pipeline' => $pipeline]) !!}
 
