@@ -7,13 +7,13 @@
         <a href="{{ route('admin.dashboard.index') }}">
             @if ($logo = core()->getConfigData('general.general.admin_logo.logo_image'))
                 <img
-                    class="h-16"
+                    class="h-8"
                     src="{{ Storage::url($logo) }}"
                     alt="{{ config('app.name') }}"
                 />
             @else
                 <img
-                    class="h-16"
+                    class="h-8"
                     src="{{ asset('Apx.jpeg') }}"
                     id="logo-image"
                     alt="{{ config('app.name') }}"
