@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::create('lead_stage_history', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('lead_id');
-            $table->unsignedBigInteger('stage_id')->nullable();
+            $table->unsignedInteger('lead_id');
+            $table->unsignedInteger('stage_id')->nullable();
             $table->string('stage_name');
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedInteger('user_id')->nullable();
             $table->text('comment')->nullable();
             $table->timestamps();
 
