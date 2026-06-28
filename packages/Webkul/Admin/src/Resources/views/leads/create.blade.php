@@ -62,6 +62,7 @@
                                 rules="required"
                                 label="Full Name"
                                 placeholder="Enter full name"
+                                value="{{ old('title') }}"
                             />
                             <x-admin::form.control-group.error control-name="title" />
                         </x-admin::form.control-group>
@@ -75,6 +76,7 @@
                                 type="text"
                                 name="phone_number"
                                 placeholder="+966 5X XXX XXXX"
+                                value="{{ old('phone_number') }}"
                             />
                             <x-admin::form.control-group.error control-name="phone_number" />
                         </x-admin::form.control-group>
@@ -88,6 +90,7 @@
                                 type="email"
                                 name="person[emails][0][value]"
                                 placeholder="email@example.com"
+                                value="{{ old('person.emails.0.value') }}"
                             />
                             <input type="hidden" name="person[emails][0][label]" value="work" />
                             <x-admin::form.control-group.error control-name="person[emails][0][value]" />
@@ -102,6 +105,7 @@
                                 type="text"
                                 name="country"
                                 placeholder="e.g. Saudi Arabia"
+                                value="{{ old('country') }}"
                             />
                             <x-admin::form.control-group.error control-name="country" />
                         </x-admin::form.control-group>
@@ -115,6 +119,7 @@
                                 type="text"
                                 name="nationality"
                                 placeholder="e.g. Saudi"
+                                value="{{ old('nationality') }}"
                             />
                             <x-admin::form.control-group.error control-name="nationality" />
                         </x-admin::form.control-group>
@@ -132,7 +137,9 @@
                             >
                                 <option value="">-- Select Source --</option>
                                 @foreach (app('Webkul\Lead\Repositories\SourceRepository')->all() as $source)
-                                    <option value="{{ $source->id }}">{{ $source->name }}</option>
+                                    <option value="{{ $source->id }}" {{ old('lead_source_id') == $source->id ? 'selected' : '' }}>
+                                        {{ $source->name }}
+                                    </option>
                                 @endforeach
                             </x-admin::form.control-group.control>
                             <x-admin::form.control-group.error control-name="lead_source_id" />
@@ -147,6 +154,7 @@
                                 type="text"
                                 name="interested_program"
                                 placeholder="e.g. MBA, Computer Science"
+                                value="{{ old('interested_program') }}"
                             />
                             <x-admin::form.control-group.error control-name="interested_program" />
                         </x-admin::form.control-group>
@@ -167,7 +175,9 @@
                                 <option value="">-- Select Degree --</option>
                                 @if ($degreeAttr)
                                     @foreach ($degreeAttr->options()->orderBy('sort_order')->get() as $opt)
-                                        <option value="{{ $opt->id }}">{{ $opt->name }}</option>
+                                        <option value="{{ $opt->id }}" {{ old('degree') == $opt->id ? 'selected' : '' }}>
+                                            {{ $opt->name }}
+                                        </option>
                                     @endforeach
                                 @endif
                             </x-admin::form.control-group.control>
@@ -185,7 +195,8 @@
                             >
                                 <option value="">-- Select Sales Owner --</option>
                                 @foreach (app('Webkul\User\Repositories\UserRepository')->all() as $user)
-                                    <option value="{{ $user->id }}" {{ auth()->guard('user')->id() == $user->id ? 'selected' : '' }}>
+                                    @php $selectedOwner = old('user_id', auth()->guard('user')->id()); @endphp
+                                    <option value="{{ $user->id }}" {{ $selectedOwner == $user->id ? 'selected' : '' }}>
                                         {{ $user->name }}
                                     </option>
                                 @endforeach
@@ -209,7 +220,9 @@
                                 <option value="">-- Select Status --</option>
                                 @if ($statusAttr)
                                     @foreach ($statusAttr->options()->orderBy('sort_order')->get() as $opt)
-                                        <option value="{{ $opt->id }}">{{ $opt->name }}</option>
+                                        <option value="{{ $opt->id }}" {{ old('lead_status') == $opt->id ? 'selected' : '' }}>
+                                            {{ $opt->name }}
+                                        </option>
                                     @endforeach
                                 @endif
                             </x-admin::form.control-group.control>
