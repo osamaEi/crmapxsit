@@ -21,7 +21,7 @@ class LeadReminderMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reminder: Lead "' . $this->lead->title . '"',
+            subject: 'Reminder: Lead "'.$this->lead->title.'"',
         );
     }
 

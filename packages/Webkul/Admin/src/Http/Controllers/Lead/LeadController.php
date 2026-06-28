@@ -388,18 +388,18 @@ class LeadController extends Controller
     {
         $data = request()->validate([
             'remind_at' => 'required|date|after:now',
-            'comment'   => 'nullable|string|max:1000',
+            'comment' => 'nullable|string|max:1000',
         ]);
 
         $lead = $this->leadRepository->findOrFail($id);
 
         DB::table('lead_reminders')->insert([
-            'lead_id'    => $lead->id,
-            'user_id'    => auth()->guard('user')->id(),
+            'lead_id' => $lead->id,
+            'user_id' => auth()->guard('user')->id(),
             'stage_name' => $lead->stage?->name,
-            'comment'    => $data['comment'] ?? null,
-            'remind_at'  => $data['remind_at'],
-            'sent'       => false,
+            'comment' => $data['comment'] ?? null,
+            'remind_at' => $data['remind_at'],
+            'sent' => false,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

@@ -26,13 +26,14 @@ class SendLeadReminders extends Command
 
             if (! $lead || ! $user || ! $user->email) {
                 DB::table('lead_reminders')->where('id', $reminder->id)->update(['sent' => true]);
+
                 continue;
             }
 
             try {
                 Mail::to($user->email)->send(new LeadReminderMail($reminder, $lead, $user));
             } catch (\Throwable $e) {
-                $this->error('Failed to send reminder #' . $reminder->id . ': ' . $e->getMessage());
+                $this->error('Failed to send reminder #'.$reminder->id.': '.$e->getMessage());
             }
 
             DB::table('lead_reminders')->where('id', $reminder->id)->update(['sent' => true]);
