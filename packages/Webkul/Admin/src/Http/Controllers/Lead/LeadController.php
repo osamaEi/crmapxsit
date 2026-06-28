@@ -384,6 +384,40 @@ class LeadController extends Controller
         return response()->json($history);
     }
 
+    public function storeReminder(int $id): JsonResponse
+    {
+        $data = request()->validate([
+            'remind_at' => 'required|date|after:now',
+            'comment'   => 'nullable|string|max:1000',
+        ]);
+
+        $lead = $this->leadRepository->findOrFail($id);
+
+        DB::table('lead_reminders')->insert([
+            'lead_id'    => $lead->id,
+            'user_id'    => auth()->guard('user')->id(),
+            'stage_name' => $lead->stage?->name,
+            'comment'    => $data['comment'] ?? null,
+            'remind_at'  => $data['remind_at'],
+            'sent'       => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return response()->json(['message' => 'Reminder set successfully.']);
+    }
+
+    public function getReminders(int $id): JsonResponse
+    {
+        $reminders = DB::table('lead_reminders')
+            ->where('lead_id', $id)
+            ->where('user_id', auth()->guard('user')->id())
+            ->orderByDesc('remind_at')
+            ->get();
+
+        return response()->json($reminders);
+    }
+
     /**
      * Search person results.
      */

@@ -48,6 +48,9 @@ Route::controller(LeadController::class)->prefix('leads')->group(function () {
 
     Route::get('{id}/stage-history', [LeadController::class, 'stageHistory'])->name('admin.leads.stage.history');
 
+    Route::post('{id}/reminders', [LeadController::class, 'storeReminder'])->name('admin.leads.reminders.store');
+    Route::get('{id}/reminders', [LeadController::class, 'getReminders'])->name('admin.leads.reminders.index');
+
     Route::controller(TagController::class)->prefix('{id}/tags')->group(function () {
         Route::post('', 'attach')->name('admin.leads.tags.attach');
 
