@@ -174,31 +174,76 @@
 
             {!! view_render_event('admin.leads.view.stages.form_controls.after', ['lead' => $lead]) !!}
 
-            <!-- Stage Comment Modal -->
+            <!-- Stage Comment + Reminder Modal -->
             <x-admin::modal ref="stageCommentModal">
                 <x-slot:header>
                     <h3 class="text-base font-semibold dark:text-white">
-                        @lang('admin::app.leads.view.stages.add-comment')
+                        Add a Comment
                     </h3>
                 </x-slot>
 
                 <x-slot:content>
+                    <!-- Moving to badge -->
                     <div class="mb-4 rounded-lg bg-blue-50 px-4 py-2 text-sm text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
                         Moving stage to:
                         <strong v-text="pendingStage ? pendingStage.name : ''"></strong>
                     </div>
 
+                    <!-- Comment -->
                     <div class="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        @lang('admin::app.leads.view.stages.comment-label')
-                        <span class="text-gray-400">(@lang('admin::app.leads.view.stages.optional'))</span>
+                        Comment
+                        <span class="text-gray-400">(optional)</span>
                     </div>
-
                     <textarea
                         v-model="stageComment"
-                        rows="4"
+                        rows="3"
                         class="w-full rounded-lg border border-gray-200 p-3 text-sm text-gray-700 outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
-                        placeholder="@lang('admin::app.leads.view.stages.comment-placeholder')"
+                        placeholder="Write a comment about this stage change..."
                     ></textarea>
+
+                    <!-- Divider -->
+                    <div class="my-4 flex items-center gap-3">
+                        <div class="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
+                        <span class="text-xs text-gray-400">REMINDER</span>
+                        <div class="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+
+                    <!-- Reminder toggle -->
+                    <label class="mb-3 flex cursor-pointer items-center gap-2">
+                        <div
+                            class="relative h-5 w-9 rounded-full transition-colors"
+                            :class="stageReminder.enabled ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'"
+                            @click="stageReminder.enabled = !stageReminder.enabled"
+                        >
+                            <div
+                                class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform"
+                                :class="stageReminder.enabled ? 'translate-x-4' : 'translate-x-0.5'"
+                            ></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Set a reminder for this lead</span>
+                    </label>
+
+                    <!-- Reminder fields -->
+                    <div v-if="stageReminder.enabled" class="grid grid-cols-1 gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3 dark:border-blue-900 dark:bg-blue-900/10 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">Date & Time <span class="text-red-500">*</span></label>
+                            <input
+                                type="datetime-local"
+                                v-model="stageReminder.remind_at"
+                                class="w-full rounded border border-gray-200 bg-white px-2.5 py-2 text-sm text-gray-800 outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                            />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">Reminder Note (optional)</label>
+                            <input
+                                type="text"
+                                v-model="stageReminder.note"
+                                placeholder="e.g. Follow up call"
+                                class="w-full rounded border border-gray-200 bg-white px-2.5 py-2 text-sm text-gray-800 outline-none focus:border-blue-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                            />
+                        </div>
+                        <p v-if="stageReminder.error" class="col-span-2 text-xs text-red-500">@{{ stageReminder.error }}</p>
+                    </div>
                 </x-slot>
 
                 <x-slot:footer>
@@ -207,7 +252,7 @@
                         class="secondary-button mr-2"
                         @click="proceedWithComment(false)"
                     >
-                        @lang('admin::app.leads.view.stages.skip-btn')
+                        Skip
                     </button>
 
                     <button
@@ -215,7 +260,7 @@
                         class="primary-button"
                         @click="proceedWithComment(true)"
                     >
-                        @lang('admin::app.leads.view.stages.save-comment-btn')
+                        Save & Continue
                     </button>
                 </x-slot>
             </x-admin::modal>
@@ -241,6 +286,13 @@
                     pendingStage: null,
 
                     stageComment: '',
+
+                    stageReminder: {
+                        enabled: false,
+                        remind_at: '',
+                        note: '',
+                        error: '',
+                    },
                 }
             },
 
@@ -250,16 +302,40 @@
                         return;
                     }
 
-                    this.pendingStage  = stage;
-                    this.stageComment  = '';
+                    this.pendingStage        = stage;
+                    this.stageComment        = '';
+                    this.stageReminder       = { enabled: false, remind_at: '', note: '', error: '' };
 
                     this.$refs.stageCommentModal.open();
                 },
 
                 proceedWithComment(saveComment) {
+                    // Validate reminder if enabled
+                    if (saveComment && this.stageReminder.enabled) {
+                        if (!this.stageReminder.remind_at) {
+                            this.stageReminder.error = 'Please select a reminder date and time.';
+                            return;
+                        }
+                        if (new Date(this.stageReminder.remind_at) <= new Date()) {
+                            this.stageReminder.error = 'Reminder date must be in the future.';
+                            return;
+                        }
+                        this.stageReminder.error = '';
+                    }
+
                     this.$refs.stageCommentModal.close();
 
                     const comment = saveComment ? this.stageComment.trim() : '';
+
+                    // Save reminder if set
+                    if (saveComment && this.stageReminder.enabled && this.stageReminder.remind_at) {
+                        this.$axios.post(`/admin/leads/{{ $lead->id }}/reminders`, {
+                            remind_at: this.stageReminder.remind_at,
+                            comment: this.stageReminder.note || null,
+                        }).then(() => {
+                            this.$emitter.emit('add-flash', { type: 'success', message: 'Reminder set! You will receive an email.' });
+                        });
+                    }
 
                     this.update(this.pendingStage, null, comment);
                 },
